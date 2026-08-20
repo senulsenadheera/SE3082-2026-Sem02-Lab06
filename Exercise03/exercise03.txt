@@ -1,1 +1,12 @@
+Output
+------------------------
+thread # 1
+Hi again from thread # 1
+thread # 0
+Inside Master # 0
+Exiting Master
+Hi again from thread # 0
 
+Answer for the question
+------------------------
+The pragma omp master directive marks a block that is executed only by the master thread, which is always thread 0, while every other thread skips the body entirely and continues straight past it. This run used the default thread count, which matches the two vCPUs on the instance, so the team consists of threads 0 and 1. The output confirms both halves of the directive's behaviour. "Inside Master" appears exactly once and reports thread 0, and unlike single it can never report any other number no matter how many times the program is run, because the executing thread is fixed rather than being whichever one arrives first. More importantly, "Hi again from thread # 1" appears before thread 0 has even printed its own first line, meaning thread 1 reached the directive, saw it was not the master, and ran straight through to the end of the parallel region without waiting. That is possible only because master has no implicit barrier at its closing brace. This is the key difference from Exercise 2: single also runs its body once, but it synchronises the team afterwards, whereas master offers no synchronisation at all. If the other threads must see the result of the master's work before proceeding, an explicit pragma omp barrier has to be added after the block.

@@ -1,1 +1,13 @@
+Output
+--------------------------------------------------------------------
+SERIAL        : fib(38) = 39088169  threads =  1  time = 0.103608 s
+TASK(nocut)   : fib(38) = 39088169  threads =  1  time = 10.642020 s
+TASK(cutoff20): fib(38) = 39088169  threads =  1  time = 0.105381 s
 
+SERIAL        : fib(38) = 39088169  threads =  1  time = 0.103091 s
+TASK(nocut)   : fib(38) = 39088169  threads =  2  time = 48.397877 s
+TASK(cutoff20): fib(38) = 39088169  threads =  2  time = 0.108654 s
+
+SERIAL        : fib(38) = 39088169  threads =  1  time = 0.102934 s
+TASK(nocut)   : fib(38) = 39088169  threads =  4  time = 61.625142 s
+TASK(cutoff20): fib(38) = 39088169  threads =  4  time = 0.109457 s

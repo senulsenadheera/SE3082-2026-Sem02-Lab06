@@ -1,1 +1,12 @@
+Output
+------------------------
+thread # 1
+Inside Single # 1
+Exiting Single
+thread # 0
+Hi again from thread # 1
+Hi again from thread # 0
 
+Answer for the question
+------------------------
+The pragma omp single directive marks a block that is executed by exactly one thread of the team, while all other threads skip the body and wait at its closing brace. In the output, "Inside Single" appears only once even though both threads printed their own thread number and "Hi again" lines, showing the block ran a single time rather than once per thread. The executing thread is not predetermined — thread 1 claimed it here simply because it arrived first, and on other runs thread 0 takes it instead. There is also an implicit barrier at the end of the region: "thread # 0" appears after "Exiting Single", meaning thread 0 was still in phase one while thread 1 had already finished the single block, yet neither "Hi again" line printed until both threads had reached the end of the region. Thread 1 therefore stopped and waited rather than running ahead. So single provides both "execute this once" semantics and a synchronisation point equivalent to pragma omp barrier, which can be removed with the nowait clause if the waiting isn't needed.

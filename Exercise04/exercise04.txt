@@ -1,1 +1,62 @@
+Output
+--------------------------
+r = 4, k = 1, thread # = 1
+r = 4, k = 2, thread # = 1
+r = 4, k = 3, thread # = 1
+r = 4, k = 4, thread # = 1
+r = 4, k = 5, thread # = 1
+r = 4, k = 6, thread # = 1
+r = 4, k = 7, thread # = 1
+r = 4, k = 8, thread # = 1
+r = 4, k = 9, thread # = 1
+r = 4, k = 10, thread # = 1
+r = 5, k = 1, thread # = 1
+r = 5, k = 2, thread # = 1
+r = 5, k = 3, thread # = 1
+r = 5, k = 4, thread # = 1
+r = 5, k = 5, thread # = 1
+r = 5, k = 6, thread # = 1
+r = 5, k = 7, thread # = 1
+r = 5, k = 8, thread # = 1
+r = 5, k = 9, thread # = 1
+r = 5, k = 10, thread # = 1
+r = 1, k = 1, thread # = 0
+r = 1, k = 2, thread # = 0
+r = 1, k = 3, thread # = 0
+r = 1, k = 4, thread # = 0
+r = 1, k = 5, thread # = 0
+r = 1, k = 6, thread # = 0
+r = 1, k = 7, thread # = 0
+r = 1, k = 8, thread # = 0
+r = 1, k = 9, thread # = 0
+r = 1, k = 10, thread # = 0
+r = 2, k = 1, thread # = 0
+r = 2, k = 2, thread # = 0
+r = 2, k = 3, thread # = 0
+r = 2, k = 4, thread # = 0
+r = 2, k = 5, thread # = 0
+r = 2, k = 6, thread # = 0
+r = 2, k = 7, thread # = 0
+r = 2, k = 8, thread # = 0
+r = 2, k = 9, thread # = 0
+r = 2, k = 10, thread # = 0
+r = 3, k = 1, thread # = 0
+r = 3, k = 2, thread # = 0
+r = 3, k = 3, thread # = 0
+r = 3, k = 4, thread # = 0
+r = 3, k = 5, thread # = 0
+r = 3, k = 6, thread # = 0
+r = 3, k = 7, thread # = 0
+r = 3, k = 8, thread # = 0
+r = 3, k = 9, thread # = 0
+r = 3, k = 10, thread # = 0
 
+Answers for the question
+---------------------------
+Question 01
+
+With a plain pragma omp parallel for, only the outer loop is parallelised; the inner loop is left completely serial and runs in full inside whichever thread owns that outer iteration. The team here has two threads, matching the two vCPUs on the instance, so the five iterations of r are divided between them using the default static schedule, which splits the range into two contiguous chunks of roughly equal size. Thread 0 received r = 1, 2 and 3 while thread 1 received r = 4 and 5, and this is exactly what the output shows. Every line for a given r reports the same thread number, and all ten k values for that r appear consecutively, confirming that a row is never split across threads. The r = 4 and r = 5 blocks printed before the r = 1 block only because thread 1 happened to reach its work first; the assignment of iterations is fixed, but the order in which the two threads produce output is not. The consequence is a load imbalance: thread 0 executes thirty of the fifty total iterations and thread 1 only twenty, because five iterations cannot be divided evenly between two threads. This also means the maximum useful parallelism is capped at five threads regardless of how many cores are available, since there are only five outer iterations to hand out.
+
+Question 02
+
+Adding collapse(2) tells the compiler to fuse the two nested loops into a single flattened iteration space before distributing any work, so instead of five chunks of r there are now fifty independent (r, k) pairs to schedule. Those fifty iterations are then divided between the two threads as twenty-five each, which cuts straight through the middle of a row: thread 0 receives r = 1 and r = 2 in full plus r = 3 with k = 1 to 5, and thread 1 receives the remainder of r = 3 from k = 6 to 10 followed by all of r = 4 and r = 5. The r = 3 line therefore appears with two different thread numbers in the output, which is the clearest single piece of evidence that collapsing occurred. The benefit is perfect load balancing, since fifty divides evenly by two where five did not, and a much larger pool of parallelism — up to fifty threads could now be given work instead of five, which matters on a machine with many cores. The restriction is that collapse only works on perfectly nested loops: there must be no statements between the outer and inner for, and the inner loop bounds must not depend on the outer loop variable, since the runtime has to compute the total iteration count in advance in order to flatten the space.

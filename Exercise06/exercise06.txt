@@ -1,0 +1,16 @@
+Output
+-------------------------------------------------
+SERIAL          : threads =  1  time = 0.001536 s
+PARALLEL(plain) : threads =  1  time = 0.001621 s
+STRIP MINED(8)  : threads =  1  time = 0.001618 s
+verification error = 0.0
+
+SERIAL          : threads =  1  time = 0.001543 s
+PARALLEL(plain) : threads =  2  time = 0.001241 s
+STRIP MINED(8)  : threads =  2  time = 0.001281 s
+verification error = 0.0
+
+SERIAL          : threads =  1  time = 0.001642 s
+PARALLEL(plain) : threads =  4  time = 0.001473 s
+STRIP MINED(8)  : threads =  4  time = 0.001514 s
+verification error = 0.0
